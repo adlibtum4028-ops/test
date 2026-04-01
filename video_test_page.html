@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>투명 영상 테스트</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, sans-serif; background: #1a1a1a; color: #fff; min-height: 100vh; padding: 24px; }
+  h1 { font-size: 20px; margin-bottom: 6px; }
+  .sub { font-size: 13px; color: #aaa; margin-bottom: 24px; }
+
+  .bg-controls {
+    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+  }
+  .bg-label { font-size: 13px; color: #aaa; }
+  .bg-btn {
+    padding: 6px 14px; border-radius: 20px; border: 1px solid #444;
+    background: transparent; color: #fff; cursor: pointer; font-size: 13px;
+    transition: all 0.2s;
+  }
+  .bg-btn.active { border-color: #fff; background: #333; }
+
+  .preview-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+    display: inline-flex;
+    margin-bottom: 20px;
+  }
+  .bg-checker {
+    background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+      linear-gradient(-45deg, #ccc 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #ccc 75%),
+      linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: #fff;
+  }
+  .bg-white { background: #ffffff; }
+  .bg-black { background: #000000; }
+  .bg-red { background: #e74c3c; }
+  .bg-blue { background: #3498db; }
+
+  video { max-width: 100%; max-height: 50vh; display: block; }
+
+  .info {
+    background: #2a2a2a; border-radius: 8px;
+    padding: 14px 16px; font-size: 13px; line-height: 2;
+  }
+  .row { display: flex; gap: 8px; }
+  .key { color: #888; min-width: 100px; }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: bold; margin-left: 6px;
+  }
+  .ok { background: #27ae60; }
+  .warn { background: #e67e22; }
+
+  .section { margin-bottom: 32px; }
+  .section-title { font-size: 15px; font-weight: bold; margin-bottom: 12px; color: #ddd; }
+</style>
+</head>
+<body>
+
+<h1>🎬 투명 영상 테스트</h1>
+<p class="sub">⚠️ 이 파일을 로컬에 저장해서 브라우저로 열어주세요!</p>
+
+<div class="bg-controls">
+  <span class="bg-label">배경:</span>
+  <button class="bg-btn active" data-bg="bg-checker">체커보드</button>
+  <button class="bg-btn" data-bg="bg-white">흰색</button>
+  <button class="bg-btn" data-bg="bg-black">검정</button>
+  <button class="bg-btn" data-bg="bg-red">빨강</button>
+  <button class="bg-btn" data-bg="bg-blue">파랑</button>
+</div>
+
+<!-- HEVC -->
+<div class="section">
+  <div class="section-title">🍎 HEVC with Alpha (.mov) — Safari용</div>
+  <div class="preview-wrapper bg-checker" id="wrap1">
+    <video autoplay loop muted playsinline>
+      <source src="https://raw.githubusercontent.com/adlibtum4028-ops/test/main/Comp_low_hevc_test-1.mov" type='video/mp4; codecs="hvc1"'>
+    </video>
+  </div>
+  <div class="info">
+    <div class="row"><span class="key">파일</span><span>Comp_low_hevc_test-1.mov <span class="badge ok">HEVC</span></span></div>
+    <div class="row"><span class="key">지원 브라우저</span><span>Safari (macOS/iOS)</span></div>
+    <div class="row"><span class="key">현재 브라우저</span><span id="browser1"></span></div>
+  </div>
+</div>
+
+<!-- WebM -->
+<div class="section">
+  <div class="section-title">🌐 WebM VP9 (.webm) — Chrome/Firefox용</div>
+  <div class="preview-wrapper bg-checker" id="wrap2">
+    <video autoplay loop muted playsinline>
+      <source src="https://raw.githubusercontent.com/adlibtum4028-ops/test/main/Comp_low_final.webm" type="video/webm">
+    </video>
+  </div>
+  <div class="info">
+    <div class="row"><span class="key">파일</span><span>Comp_low.webm <span class="badge ok">WebM</span></span></div>
+    <div class="row"><span class="key">지원 브라우저</span><span>Chrome, Firefox, Edge</span></div>
+    <div class="row"><span class="key">현재 브라우저</span><span id="browser2"></span></div>
+  </div>
+</div>
+
+<script>
+  const ua = navigator.userAgent;
+  let browser = '';
+  if (/Safari/.test(ua) && !/Chrome/.test(ua)) browser = '🧭 Safari — HEVC 재생 가능';
+  else if (/Chrome/.test(ua)) browser = '🌐 Chrome — WebM 재생 가능';
+  else if (/Firefox/.test(ua)) browser = '🦊 Firefox — WebM 재생 가능';
+  else browser = ua;
+
+  document.getElementById('browser1').textContent = browser;
+  document.getElementById('browser2').textContent = browser;
+
+  document.querySelectorAll('.bg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const bg = btn.dataset.bg;
+      document.getElementById('wrap1').className = 'preview-wrapper ' + bg;
+      document.getElementById('wrap2').className = 'preview-wrapper ' + bg;
+    });
+  });
+</script>
+</body>
+</html>
